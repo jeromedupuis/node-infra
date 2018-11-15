@@ -1,0 +1,104 @@
+# ------------------------------------------------------------------------------------------------------------------------------
+# Version
+# ------------------------------------------------------------------------------------------------------------------------------
+version: "3.7"
+
+# ------------------------------------------------------------------------------------------------------------------------------
+# Volumes
+# ------------------------------------------------------------------------------------------------------------------------------
+volumes:
+  node_modules:
+    driver: "local"
+
+# ------------------------------------------------------------------------------------------------------------------------------
+# Services
+# ------------------------------------------------------------------------------------------------------------------------------
+services:
+
+### WEB #################################################
+  web:
+    container_name: infra-web
+    build:
+      context: .
+      dockerfile: "./.docker/dev/client/Dockerfile"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./client/app:/var/www/infra-web"
+      - "./client/app/node_modules:/var/www/infra-web/node_modules"
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=dev
+      - PORT=8081
+      - HOST=0.0.0.0
+
+
+### ADMIN WEB #################################################
+  admin_web:
+    container_name: infra-admin-web
+    build:
+      context: .
+      dockerfile: "./.docker/admin.web.Dockerfile"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./client/app:/var/www/infra-admin-web"
+      - "./client/app/node_modules:/var/www/infra-admin-web/node_modules"
+    ports:
+      - "9081:9081"
+
+
+### API #################################################
+  api:
+    container_name: infra-api
+    build:
+      context: .
+      dockerfile: "./.docker/dev/server/Dockerfile"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./server/app:/var/www/infra-api"
+      - "./server/app/node_modules:/var/www/infra-api/node_modules"
+    ports:
+      - "8082:8082"
+    environment:
+      - NODE_ENV=dev
+      - PORT=8082
+      - HOST=0.0.0.0
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB=dev_infra
+
+
+### ADMIN API #################################################
+  admin_api:
+    container_name: infra-admin-api
+    build:
+      context: .
+      dockerfile: "./.docker/dev/server/Dockerfile.admin"
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./server/admin:/var/www/infra-admin-api"
+      - "./server/admin/node_modules:/var/www/infra-admin-api/node_modules"
+    ports:
+      - "9082:9082"
+    environment:
+      - NODE_ENV=dev
+      - PORT=9082
+      - HOST=0.0.0.0
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_DB=dev_infra
+
+
+
+### MongoDB ##############################################
+  mongo:
+    container_name: infra-mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - /data/db:/data/db

@@ -1,0 +1,34 @@
+# ------------------------------------------------------------------------------------------------------------------------------
+# Version
+# ------------------------------------------------------------------------------------------------------------------------------
+version: "3.7"
+
+services:
+
+### WEB #################################################
+  web:
+    container_name: infra-web
+    build:
+      dockerfile: "./.docker/prod/client/Dockerfile"
+    volumes:
+      - "/usr/share/nginx/html"
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=prod
+      - PORT=80
+      - HOST=infra.com
+
+### API #################################################
+  api:
+    container_name: infra-web
+    build:
+      dockerfile: "./.docker/prod/server/Dockerfile"
+    volumes:
+      - "/var/www/infra-api"
+    ports:
+      - "8082:8082"
+    environment:
+      - NODE_ENV=prod
+      - PORT=8082
+      - HOST=api.infra.com
